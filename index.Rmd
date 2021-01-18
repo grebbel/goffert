@@ -1,0 +1,205 @@
+---
+title: "Zoektocht in Goffert."
+date: '`r format(Sys.Date(), "%d %B %Y")`'
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    version: '1.0'
+    css: styles.css
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())  # remove all data from global environment.
+setwd("~/Documents/01_Workspace/01_Rproject/goffertspeur8")
+
+library(flexdashboard)
+library(tidyverse)
+#library(kableExtra)
+#library(stringr)
+library(leaflet)
+library(rgdal)    # GDAL bindings for loading GPX-data
+library(sp)       # spatial operations library
+library(lubridate)# datetime-operatings, here to convert from strings
+library(ggplot2)  # general plotting library
+library(exifr)
+library(leafpop)
+```
+
+
+
+```{r load, echo = FALSE, message=FALSE, warning=FALSE, results = 'hide'} 
+
+# GPX_file <- 'source/Duffelt.gpx'
+# wp <- readOGR(GPX_file, layer = "track_points")
+
+
+```
+
+
+```{r elevation} 
+
+#head(wp[,c('ele', 'time')])
+
+
+
+# dif <- max(wp$ele) - min(wp$ele) # height climbed in meters
+# 
+# dif <- round(dif, digits = 2)
+
+```
+
+
+```{r distance}
+# distance <- spDists(wp, segments=TRUE)
+# sum_dist <- sum(distance) 
+# sum_dist <- round(sum_dist, digits = 2)
+
+
+```
+
+```{r plot_dist}
+# wp$time <- ymd_hms(wp$time)   # convert timestamps to datetime-objects
+# 
+# dispt <- spDists(wp, segments = TRUE)
+# 
+# dispt <- as.data.frame(dispt)
+# 
+# dispt[nrow(dispt) + 1,] = c(0)
+# 
+# #sum(dispt)
+# 
+# 
+# wp2 <- as.data.frame(wp)
+# 
+# wp2 <- wp2 %>% 
+#   select(track_seg_point_id, ele, time, coords.x1, coords.x2)
+# 
+# wp2 <- cbind(wp2, dispt)
+# wp2$cumdist <- cumsum(wp2$dispt)
+# 
+# p <- ggplot(data = wp2) +  
+#   aes(x=cumdist, y=ele) + 
+#   geom_area(color = "brown", fill = "yellow") + 
+#   labs(x='Walking distance', y='Elevations (meters)') + 
+#   theme(text = element_text(size = 8))
+```
+
+
+```{r track}
+# track <- readOGR(GPX_file, layer = "tracks", verbose = FALSE)
+```
+
+```{r layers}
+# m <- leaflet() %>%
+# 
+#   # Add tiles
+#   addProviderTiles("OpenStreetMap.Mapnik", group = "Road map") %>%
+#   addProviderTiles("Esri.WorldImagery", group = "Satellite") %>%
+# 
+#   addLegend(position = 'bottomright',opacity = 0.4,
+#             colors = 'blue',
+#             labels = 'Goffert',
+#             title = 'Speurtocht') %>%
+# 
+#   # Layers control
+#   addLayersControl(position = 'bottomright',
+#     baseGroups = c("Road map", "Satellite"),
+#     overlayGroups = c("Speurtocht", "Photo markers"),
+#     options = layersControlOptions(collapsed = FALSE)) %>%
+# 
+#   addPolylines(data=track, color='blue', group='Speurtocht')
+# 
+
+```
+
+```{r layers2}
+
+files <- list.files(pattern = "*.JPG", recursive = TRUE)
+dat <- read_exif(files)
+
+# Extract only the usefull data
+dat2 <- select(dat,
+	SourceFile, DateTimeOriginal,
+	GPSLongitude, GPSLatitude, GPSAltitude)
+
+	#write.csv(dat2, 'Exifdata.csv',
+#	row.names = F)
+
+
+```
+
+
+```{r combine}
+
+greenLeafIcon <- makeIcon(
+  iconUrl = "http://leafletjs.com/examples/custom-icons/leaf-green.png",
+  iconWidth = 38, iconHeight = 95,
+  iconAnchorX = 22, iconAnchorY = 94,
+  shadowUrl = "http://leafletjs.com/examples/custom-icons/leaf-shadow.png",
+  shadowWidth = 50, shadowHeight = 64,
+  shadowAnchorX = 4, shadowAnchorY = 62
+)
+
+
+
+m <- leaflet() %>%
+
+  # Add tiles
+  addProviderTiles("OpenStreetMap.Mapnik", group = "Road map") %>%
+  addProviderTiles("Esri.WorldImagery", group = "Satellite") %>%
+
+  addLegend(position = 'bottomright',opacity = 0.4, 
+            colors = 'blue', 
+            labels = 'Goffert',
+            title = 'Speurtocht') %>%
+
+  # Layers control
+  addLayersControl(position = 'bottomright',
+    baseGroups = c("Road map", "Satellite"),
+    overlayGroups = c("Photo markers"),
+    options = layersControlOptions(collapsed = FALSE)) %>%
+
+ # addPolylines(data=track, color='blue', group='Speurtocht') %>% 
+  
+  addMarkers(data = dat2, lng=dat2$GPSLongitude, lat=dat2$GPSLatitude,  
+                icon = greenLeafIcon, 
+                group = "Photo markers",
+               popup = popupImage(files, src = "local", embed = TRUE) 
+    )  
+
+```
+
+
+Goffert Speurtocht
+=======================================================================
+
+
+Column {data-width=600}
+-----------------------------------------------------------------------
+
+### kaart
+```{r}
+
+m
+
+
+```
+
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+### Uitleg
+Je hebt nodig:  
+- een pen en papier voor aantekeningen  
+- een mobieltje met internet (en eventueel QR-code scanner)  
+  
+Klik op een blad op de kaart en zoek de plek van de foto.  
+Bij elke foto-plek is een *QR-code* te vinden. Kijk goed rond.  
+Scan de QR-code met je telefoon. Als het goed is, dan opent er een website met een raadsel. Vul het antwoord in de onderstaande tabel.  
+In de rode verticale kolom krijg je een woord.  
+Mail dit woord met je naam naar: grebbelberg@gmail.com.  
+
+### Puzzel-tabel
+
+<img border="0" src="images/table.png" alt="" />     
