@@ -1,0 +1,39 @@
+---
+title: "- GAMMA -"
+author:
+- name: Bob Grebbel
+  affiliation: Speurneus
+date: '`r format(Sys.Date(), "%d %B %Y")`'
+output:
+  html_document:
+    code_folding: hide
+    css: styles.css
+    df_print: paged
+    highlight: pygments
+    number_sections: no
+    self_contained: yes
+    toc: no
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: no
+    toc_depth: '3'
+version: '0.1'
+
+---
+
+<img src="./source/logo_amber.png" style="position:absolute;top:0px;right:0px;" />
+<!-- <div class="watermark">CASUS RJtH</div> -->
+<style>
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    background-color: rgb(21, 66, 115);
+}
+</style>
+
+
+
+# Raadsel GAMMA   
+  
+Het loopt dag en nacht in de keuken, maar het wordt niet moe en zeker niet warm. Wat is het?  
+  
+Schrijf het antwoord in de tabel in rij **GAMMA**. 
